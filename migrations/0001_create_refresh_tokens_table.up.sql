@@ -9,4 +9,5 @@ CREATE TABLE IF NOT EXISTS refresh_tokens (
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_revoked BOOLEAN NOT NULL DEFAULT FALSE
 );
-
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_guid ON refresh_tokens(user_GUID);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expires_at ON refresh_tokens(expires_at);

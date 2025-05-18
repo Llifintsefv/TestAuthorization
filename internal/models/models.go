@@ -8,7 +8,7 @@ import (
 )
 
 type AccessTokenClaims struct {
-	UserGUID  string `json:"user_guid"`
+	UserGUID string `json:"user_guid"`
 	jwt.RegisteredClaims
 }
 
@@ -33,8 +33,8 @@ type RefreshTokenRequest struct {
 }
 
 type TokenPair struct {
-	AccessToken  string
-	RefreshToken string
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
 }
 
 type WebhookPayload struct {

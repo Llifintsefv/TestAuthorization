@@ -11,7 +11,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -96,8 +95,6 @@ func (s *service) RefreshToken(ctx context.Context, refreshToken string, clientI
 
 	jti := parts[0]
 
-	fmt.Println("jti: ", jti)
-	fmt.Println("RawRefreshToken: ", RawRefreshToken)
 	TokenData, err := s.repo.GetRefreshToken(ctx, jti)
 	if err != nil {
 		if errors.Is(err, models.ErrUserNotFound) {
@@ -107,7 +104,7 @@ func (s *service) RefreshToken(ctx context.Context, refreshToken string, clientI
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(TokenData.TokenHash), []byte(RawRefreshToken)); err != nil {
-		s.logger.InfoContext(ctx, "Refresh token changed", "user_id", TokenData.UserGUID, "old_refresh_token", TokenData.TokenHash, "new_refresh_token", RawRefreshToken)
+		s.logger.InfoContext(ctx, "Refresh token changed", "user_id", TokenData.UserGUID)
 		err = s.repo.RevokeAllUserTokens(ctx, TokenData.UserGUID)
 		if err != nil {
 			return models.TokenPair{}, err

@@ -16,5 +16,6 @@ func SetupRouter(handler handler.Handler, middleware *middleware.AuthMiddleware)
 	protectedApiV1 := app.Group("/")
 	protectedApiV1.Use(middleware.AuthMiddleware())
 	protectedApiV1.Get("users/me",handler.GetUserGUID)
+	protectedApiV1.Post("/auth/logout", handler.UserLogout)
 	return app
 }

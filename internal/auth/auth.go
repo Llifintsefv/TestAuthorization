@@ -3,6 +3,7 @@ package auth
 import (
 	"TestTaskAuthorization/internal/models"
 	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"log/slog"
 	"time"
@@ -68,10 +69,10 @@ func (a *auth) GenerateRefreshToken() (string, string, error) {
 	if err != nil {
 		a.logger.Error("failed to generate refresh token secret", "error", err)
 		return "", "", fmt.Errorf("failed to generate refresh token secret: %w", err)
-
 	}
 
-	refreshToken := fmt.Sprintf("%s.%s", jti, secretBytes)
+	secretPart := hex.EncodeToString(secretBytes)
+	refreshToken := fmt.Sprintf("%s.%s", jti, secretPart)
 
 	return jti, refreshToken, nil
 
@@ -97,14 +98,12 @@ func (a *auth) ParseAccessToken(accessToken string) (models.AccessTokenClaims, e
 		return models.AccessTokenClaims{}, err
 	}
 
-
 	claims, ok := token.Claims.(*models.AccessTokenClaims)
 	if !ok || !token.Valid {
 		err := fmt.Errorf("invalid access token")
 		a.logger.Error("invalid access token", "error", err)
 		return models.AccessTokenClaims{}, err
 	}
-	
 
 	return *claims, nil
 }

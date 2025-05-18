@@ -42,8 +42,8 @@ func NewDB(strConn string) (*pgxpool.Pool, error) {
 }
 
 func (r *repository) SaveRefresh(ctx context.Context, refreshTokenData models.RefreshToken) error {
-	query := `INSERT INTO refresh_tokens (jti, token_hash, user_GUID, expires_at, ip_address, user_agent_hash) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err := r.db.Exec(ctx, query, refreshTokenData.JTI, refreshTokenData.TokenHash, refreshTokenData.UserGUID, refreshTokenData.ExpiresAt, refreshTokenData.IPAddress, refreshTokenData.UserAgentHash)
+	query := `INSERT INTO refresh_tokens (jti, token_hash, user_GUID, expires_at, user_agent_hash) VALUES ($1, $2, $3, $4, $5)`
+	_, err := r.db.Exec(ctx, query, refreshTokenData.JTI, refreshTokenData.TokenHash, refreshTokenData.UserGUID, refreshTokenData.ExpiresAt, refreshTokenData.UserAgentHash)
 	if err != nil {
 		r.logger.Error("failed to save refresh token", "error", err)
 		return err
@@ -52,7 +52,7 @@ func (r *repository) SaveRefresh(ctx context.Context, refreshTokenData models.Re
 }
 
 func (r *repository) GetRefreshToken(ctx context.Context, jti string) (models.RefreshToken, error) {
-	query := `SELECT token_hash, user_GUID, expires_at, ip_address, user_agent_hash FROM refresh_tokens WHERE jti = $1 AND is_revoked = FALSE`
+	query := `SELECT token_hash, user_GUID, expires_at, user_agent_hash FROM refresh_tokens WHERE jti = $1 AND is_revoked = FALSE`
 	rows, err := r.db.Query(ctx, query, jti)
 	if err != nil {
 		r.logger.Error("failed to get refresh token", "error", err)
@@ -61,7 +61,7 @@ func (r *repository) GetRefreshToken(ctx context.Context, jti string) (models.Re
 	defer rows.Close()
 	var refreshTokenData models.RefreshToken
 	if rows.Next() {
-		if err := rows.Scan(&refreshTokenData.TokenHash, &refreshTokenData.UserGUID, &refreshTokenData.ExpiresAt, &refreshTokenData.IPAddress, &refreshTokenData.UserAgentHash); err != nil {
+		if err := rows.Scan(&refreshTokenData.TokenHash, &refreshTokenData.UserGUID, &refreshTokenData.ExpiresAt, &refreshTokenData.UserAgentHash); err != nil {
 			r.logger.Error("failed to scan refresh token", "error", err)
 			return models.RefreshToken{}, err
 		}
